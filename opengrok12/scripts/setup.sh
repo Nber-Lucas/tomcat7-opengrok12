@@ -47,7 +47,7 @@ function setup_tomcat()
 	#echo $REPLACE_STR1
 	cp $SRC_FILE $DEC_FILE
 	sleep 2
-	echo '123456' | sudo -S sed -i 's/'$REPLACE_STR'/'  $REPLACE_DECFILE
+	echo $2 | sudo -S sed -i 's/'$REPLACE_STR'/'  $REPLACE_DECFILE
 }
 
 
@@ -104,7 +104,7 @@ function running()
 				setup_run
 				retn=$?
 				if [ $retn -eq 0 ] ; then
-        			setup_tomcat $1
+        			setup_tomcat $1 $3
 					retn=$?
 				fi
 			fi
@@ -143,7 +143,7 @@ else
 #		setup_tomcat $1
 #		echo "============================"
 
-	running $1 $2
+	running $1 $2 $3
 	
 	fi
 fi
