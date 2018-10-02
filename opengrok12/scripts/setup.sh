@@ -37,6 +37,7 @@ function setup_run()
 
 function setup_tomcat()
 {
+	
 	local SRC_FILE="$OPENGROK_LIB/source.war"
 	local DEC_FILE="$TOMCAT7_WEBAPPS/$1.war"
 	local REPLACE_STR0="\/var\/opengrok"
@@ -44,10 +45,15 @@ function setup_tomcat()
 	local REPLACE_DECFILE="$TOMCAT7_WEBAPPS/$1/WEB-INF/web.xml"
 	local REPLACE_STR="$REPLACE_STR0/$REPLACE_STR1"
 
+
+	echo "############### opengrok deploy start ###############"
 	#echo $REPLACE_STR1
 	cp $SRC_FILE $DEC_FILE
-	sleep 2
-	echo $2 | sudo -S sed -i 's/'$REPLACE_STR'/'  $REPLACE_DECFILE
+	sleep 10
+	#echo '123456' | sudo -S sed -i 's/'$REPLACE_STR'/'  $REPLACE_DECFILE
+	sudo -S sed -i 's/'$REPLACE_STR'/'  $REPLACE_DECFILE
+	echo "############### opengrok deploy end ###############"
+	echo ""
 }
 
 
@@ -103,16 +109,33 @@ function running()
 			if [ $retn -eq 0 ] ; then
 				setup_run
 				retn=$?
-				if [ $retn -eq 0 ] ; then
-        			setup_tomcat $1 $3
-					retn=$?
-				fi
+				#if [ $retn -eq 0 ] ; then
+        			#setup_tomcat $1
+					#retn=$?
+				#fi
 			fi
 		fi
         echo "============================"
 		local ret=$retn
 		local end_time=$(date +"%s")
 		_wrap_build $start_time $ret $end_time
+
+	local color_failed=$'\E'"[0;31m"
+	local color_success=$'\E'"[0;32m"
+	local color_reset=$'\E'"[00m"
+
+	if [ $retn -eq 0 ] ; then
+		setup_tomcat $1
+		echo
+    	if [ $? -eq 0 ] ; then
+        	echo -n "${color_success}#### opengrok deploy successfully "
+    	else
+        	echo -n "${color_failed}#### opengrok deploy failed "
+    	fi
+		echo " ####${color_reset}"
+		echo
+	fi
+
 }
 #
 #Main Program
@@ -142,8 +165,7 @@ else
 #		setup_run
 #		setup_tomcat $1
 #		echo "============================"
-
-	running $1 $2 $3
+	running $1 $2
 	
 	fi
 fi
